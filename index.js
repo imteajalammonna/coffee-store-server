@@ -9,7 +9,11 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-
+const corsOptions = {
+    origin: 'https://coffee-store-c45c5.web.app',
+  };
+  
+  app.use(cors(corsOptions));
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@starter.iwcfqvq.mongodb.net/?retryWrites=true&w=majority`;
@@ -28,6 +32,7 @@ async function run() {
         await client.connect();
 
         const coffeeCollection = client.db('coffeeDB').collection('coffee');
+        const userCollection = client.db('coffeeDB').collection('user');
 
         app.get('/coffee', async(req , res)=> {
             const cursor = coffeeCollection.find();
@@ -35,10 +40,39 @@ async function run() {
             res.send(result);
         })
 
+        app.get('/coffee/:id' , async(req , res )=> {
+            const id = req.params.id;
+            const query = {_id : new ObjectId(id)};
+            const result = await coffeeCollection.findOne(query);
+            res.send(result);
+        })
+
         app.post('/coffee', async (req, res) => {
             const newCoffee = req.body;
             // console.log(newCoffee);
             const result = await coffeeCollection.insertOne(newCoffee);
+            res.send(result);
+        })
+
+        app.put('/coffee/:id', async (req  , res)=> {
+            const id= req.params.id;
+            const filter = {_id: new ObjectId(id)}
+            const options = {upset : true };
+            const updatedCoffee = req.body;
+            const coffee = {
+                $set: {
+                    name: updatedCoffee.name,
+                    quantity : updatedCoffee.quantity,
+                    supplier : updatedCoffee.supplier,
+                    taste : updatedCoffee.taste,
+                    category : updatedCoffee.category,
+                    price : updatedCoffee.price,
+                    photo: updatedCoffee.photo
+
+                }
+            }
+
+            const result = await coffeeCollection.updateOne(filter, coffee , options);
             res.send(result);
         })
         
@@ -49,6 +83,11 @@ async function run() {
             res.send(result);
         })
 
+        app.post('/user', async (req, res )=> {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
+            res.send(result);
+        })
 
 
         // Send a ping to confirm a successful connection
