@@ -9,11 +9,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const corsOptions = {
-    origin: 'https://coffee-store-c45c5.web.app',
-  };
-  
-  app.use(cors(corsOptions));
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@starter.iwcfqvq.mongodb.net/?retryWrites=true&w=majority`;
