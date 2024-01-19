@@ -34,6 +34,11 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+        app.get('/user', async(req , res)=> {
+            const cursor = coffeeCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
         app.get('/coffee/:id' , async(req , res )=> {
             const id = req.params.id;
